@@ -7,9 +7,20 @@ float ang = 63.435;      //constant angle, made from arctan(long side/small side
 String val;       //input from potentiometer
 int deg;
 float acc,velo;
-PImage img_bg, img_car;
+PImage img_bg, img_car, img_steer;
 
 Car mobil, dest;
+
+void displaySteer() {
+  translate(width - 125, height - 125);
+  rotate(radians(-deg*2));
+  
+  tint(255, 127);
+  image(img_steer, -50, -53, 100, 100);
+  
+  rotate(radians(deg*2));
+  translate(-width + 125, -height + 125);
+}
 
 void makeDest() {
   //new destination was made with margin 75px
@@ -28,18 +39,19 @@ void setup() {
   System.setProperties(systemSettings);
   */
   
-  //port = new Serial(this, Serial.list()[1], 250000);
+  port = new Serial(this, Serial.list()[1], 250000);
   
   size(720,640);
   mobil = new Car(width/2, height/2, 0, 0);
   makeDest();
   
-  frameRate(60);
+  frameRate(50);
   
   acc = 0;
   
   img_bg = loadImage("bg.png");
   img_car = loadImage("car.png");
+  img_steer = loadImage("steer.png");
 }
 
 boolean checkCar() {
@@ -79,8 +91,10 @@ void draw() {
   if (velo < 0) velo = min(0,max(-5, velo));
   
   mobil.move(velo);
-  println(acc,' ',velo);
+  //println(acc,' ',velo);
   mobil.display();                      //show the car
+  
+  displaySteer();
   
   if (checkCar()) {
     //if car has been already inside destination, make new destinantion
@@ -89,13 +103,13 @@ void draw() {
   
   val = "512";                          //when something went wrong, we make the car go forward
   
-  /*if(port.available() > 0) {
+  if(port.available() > 0) {
     val = port.readStringUntil('\n');
     if(val != null) val = trim(val);    //remove non numeric from val
       else val = "512";
-  }*/
-  //deg = Integer.parseInt(val) * -40 / 1023 + 20;  //limit the turn into max of 20 degrees.
-  //println(deg);
+  }
+  deg = Integer.parseInt(val) * -40 / 1023 + 20;  //limit the turn into max of 20 degrees.
+  println(deg);
 }
 
 void keyPressed() {
